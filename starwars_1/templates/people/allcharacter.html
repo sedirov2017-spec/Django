@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГАЛАКТИЧЕСКАЯ БАЗА ДАННЫХ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3a 100%);
+            color: #e0f7ff;
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 100, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 200, 0.1) 0%, transparent 40%),
+                linear-gradient(45deg, transparent 49%, rgba(0, 150, 255, 0.05) 50%, transparent 51%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px;
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #00ccff, #ff00ff, #00ccff) 1;
+            background: rgba(10, 20, 40, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow: 
+                0 15px 40px rgba(0, 100, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #00ccff 20%, 
+                #ff00ff 50%, 
+                #00ccff 80%, 
+                transparent 100%);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #00ccff, #ff00ff, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(0, 200, 255, 0.7);
+            font-weight: 900;
+            animation: titleGlow 3s infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 20px rgba(0, 200, 255, 0.7); }
+            100% { text-shadow: 0 0 40px rgba(255, 0, 255, 0.7); }
+        }
+
+        .header p {
+            font-size: 1.4em;
+            opacity: 0.9;
+            color: #a0d2ff;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        .status-bar {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+            padding: 20px;
+            border: 2px solid;
+            border-image: linear-gradient(90deg, #00ff88, #0088ff, #8800ff) 1;
+            background: linear-gradient(90deg, 
+                rgba(0, 255, 136, 0.1), 
+                rgba(0, 136, 255, 0.1), 
+                rgba(136, 0, 255, 0.1));
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #00ffcc;
+            box-shadow: 0 10px 25px rgba(0, 150, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent);
+            animation: scanLine 2s infinite linear;
+        }
+
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .character-card {
+            border: 3px solid;
+            border-image: linear-gradient(45deg, #00ccff, #8800ff) 1;
+            padding: 30px;
+            background: linear-gradient(135deg, 
+                rgba(20, 30, 60, 0.8) 0%, 
+                rgba(40, 20, 80, 0.6) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .character-card::before {
+            content: '◆';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ccff;
+            font-size: 1.5em;
+            text-shadow: 0 0 15px #00ccff;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        .character-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ccff, transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .character-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 25px 50px rgba(0, 100, 255, 0.4),
+                0 0 100px rgba(100, 0, 255, 0.3);
+            border-image: linear-gradient(45deg, #ff00ff, #00ccff) 1;
+        }
+
+        .character-card:hover::after {
+            opacity: 1;
+        }
+
+        .character-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .character-card a:hover .character-name {
+            background: linear-gradient(90deg, #ff6600, #ffcc00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .character-name {
+            font-size: 1.8em;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #00ccff, #a0a0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding-left: 35px;
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .character-stats {
+            margin-bottom: 25px;
+            padding-left: 35px;
+            border-left: 2px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .stat {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .stat:hover {
+            background-color: rgba(0, 150, 255, 0.15);
+        }
+
+        .stat-label {
+            width: 120px;
+            color: #00ccff;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 1.1em;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+            flex: 1;
+            text-align: right;
+        }
+
+        .status-indicator {
+            font-size: 1em;
+            color: #00ffaa;
+            margin-top: 20px;
+            padding-left: 35px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #00ffaa;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00ffaa;
+            animation: statusPulse 1.5s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .system-info {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            border: 2px solid;
+            border-image: linear-gradient(90deg, 
+                transparent 0%, 
+                #00aaff 20%, 
+                transparent 40%,
+                #ff00aa 60%,
+                transparent 80%) 1;
+            color: #00ffcc;
+            font-size: 1.1em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: rgba(0, 40, 80, 0.5);
+            border-radius: 12px;
+            text-shadow: 0 2px 10px rgba(0, 255, 200, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 100, 255, 0.2);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 3px solid;
+            border-image: linear-gradient(90deg, 
+                transparent, 
+                #00aaff, 
+                #ff00ff, 
+                #00aaff, 
+                transparent) 1;
+            color: #88aadd;
+            font-size: 1em;
+            background: rgba(10, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            letter-spacing: 1.5px;
+            line-height: 1.8;
+        }
+
+        .footer br {
+            margin: 10px 0;
+            display: block;
+            content: '';
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ГАЛАКТИЧЕСКАЯ БАЗА ДАННЫХ</h1>
+            <p>Архив всех разумных существ известной галактики</p>
+        </div>
+
+        <div class="status-bar">
+            ████████████████████████████████████████ 100%
+        </div>
+
+        <div class="system-info">
+            СИСТЕМА: ОНЛАЙН | БАЗА ДАННЫХ: ЗАГРУЖЕНА | ОБНОВЛЕНО: 14:30 ГСТ
+        </div>
+
+        <div class="characters-grid">
+            {%for character in characters%}
+            <div class="character-card">
+                <a href="{% url 'character' id=character.id %}">
+                    <div class="character-name">{{character.name}}</div>
+                    <div class="character-stats">
+                        <div class="stat">
+                            <span class="stat-label">Рост:</span>
+                            <span class="stat-value">{{character.height}}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Масса:</span>
+                            <span class="stat-value">{{character.mass}}</span>
+                        </div>
+                    </div>
+                    <div class="status-indicator">СТАТУС: АКТИВЕН</div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="footer">
+            КАТЕГОРИЯ: РАЗУМНЫЕ СУЩЕСТВА<br>
+            ОБНОВЛЕНО: СЕГОДНЯ 14:30 ГСТ<br>
+            ВСЕГО ЗАПИСЕЙ: 12
+        </div>
+    </div>
+</body>
+</html>
